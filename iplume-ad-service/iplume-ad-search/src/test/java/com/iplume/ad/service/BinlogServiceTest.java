@@ -34,6 +34,13 @@ public class BinlogServiceTest {
     //     [10, 10, 奔驰]
     //]}
 
+//     21:44:46.517 [main] INFO com.iplume.ad.service.BinlogServiceTest - Add---------------------
+//             21:44:46.518 [main] INFO com.iplume.ad.service.BinlogServiceTest - WriteRowsEventData{tableId=68, includedColumns={0, 1, 2, 3, 4, 5, 6, 7}, rows=[
+//     [10, 10, 计划一, 1, Fri Jan 01 08:00:00 CST 2021, Fri Jan 01 08:00:00 CST 2021, Fri Jan 01 08:00:00 CST 2021, Fri Jan 01 08:00:00 CST 2021]
+// ]}
+
+    // Fri Jan 01 08:00:00 CST 2021
+
     public static void main(String[] args) throws IOException {
 
         // BinLog客户端创建.

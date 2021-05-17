@@ -1,7 +1,13 @@
 package com.iplume.ad.utils;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.time.DateUtils;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -45,6 +51,33 @@ public class CommonUtils {
         result.deleteCharAt(result.length() - 1);
 
         return result.toString();
+    }
+
+    /**
+     * Binlog中的日期形式格式化成Date.
+     * <p>
+     * sql插入时日期数据: '2021-01-01 00:00:00'.
+     * Binlog打印时的日期数据: Fri Jan 01 08:00:00 CST 2021.
+     *
+     * @param dateString 日期字符串.
+     * @return 日期/
+     */
+    public static Date parseDateString(String dateString) {
+
+        try {
+
+            DateFormat dateFormat = new SimpleDateFormat(
+                    "EEE MMM dd HH:mm:ss zzz yyyy",
+                    Locale.US
+            );
+
+            return DateUtils.addHours(
+                    dateFormat.parse(dateString),
+                    -8);
+        } catch (ParseException ex) {
+            log.error("parseStringDate error: {}", dateString);
+            return null;
+        }
     }
 
 }
