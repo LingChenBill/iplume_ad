@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: iplume-ad-gateway
+server:
+  port: 9000
+eureka:
+  client:
+    service-url:
+      defaultZone: http://server1:8000/eureka/
+# 路由配置.
+zuul:
+  # 路由前缀.
+  prefix: /iplume
+  # 路由规则.
+  routes:
+    # ad-sponsor微服务路由规则.
+    sponsor:
+      # 路径匹配规则(与context-path中设置的前缀相似).
+      path: /ad-sponsor/**
+      # 微服务Id.
+      serviceId: eureka-client-ad-sponsor
+      # 是否过滤服务前缀.
+      # 访问url: http://localhost:9000/iplume/ad-sponsor/create/adPlan
+      strip-prefix: false

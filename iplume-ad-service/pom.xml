@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>iplume-ad</artifactId>
+        <groupId>com.iplume.ad</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>iplume-ad-service</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>iplume-ad-common</module>
+        <module>iplume-ad-sponsor</module>
+        <module>iplume-ad-search</module>
+    </modules>
+
+    <name>iplume-ad-service</name>
+    <description>Project for iplume ad service</description>
+
+</project>

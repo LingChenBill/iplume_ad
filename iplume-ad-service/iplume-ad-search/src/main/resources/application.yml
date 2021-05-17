@@ -1,0 +1,51 @@
+server:
+  port: 7001
+  servlet:
+    # 默认url映射.
+    context-path: /ad-search
+spring:
+  application:
+    name: eureka-client-ad-search
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate.format_sql: true
+    open-in-view: false
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/iplume_ad?autoReconnect=true
+    username: root
+    password: Aa123456
+    tomcat:
+      max-active: 4
+      min-idle: 2
+      initial-size: 2
+
+# eureka config.
+eureka:
+  client:
+    service-url:
+      defaultZone: http://server1:8000/eureka/
+
+# feign配置.
+feign:
+  hystrix:
+    enabled: true
+
+# 暴露规则.
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+# Binlog相关配置.
+adconf:
+  mysql:
+    host: 127.0.0.1
+    post: 3306
+    username: root
+    password: Aa123456
+    binlogName: ""
+    position: -1
