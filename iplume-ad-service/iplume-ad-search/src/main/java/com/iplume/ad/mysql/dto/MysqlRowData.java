@@ -37,6 +37,7 @@ public class MysqlRowData {
 
     /**
      * 数据Map.
+     * 数据格式: <字段名, 值>.
      */
     private List<Map<String, String>> fieldValueMap = new ArrayList<>();
 

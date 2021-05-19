@@ -26,11 +26,10 @@ import java.util.Map;
 @Component
 public class IncrementListener implements Ilistener{
 
-    // TODO:
     /**
      * 消息.
      */
-    @Resource(name = "")
+    @Resource(name = "indexSender")
     private ISender sender;
 
     /**

@@ -43,6 +43,7 @@ public class BinlogClient {
     /**
      * Binlog的监听连接.
      */
+    @SuppressWarnings("AlibabaAvoidManuallyCreateThread")
     public void connect() {
 
         // 在一个线程中开启监听事件.
