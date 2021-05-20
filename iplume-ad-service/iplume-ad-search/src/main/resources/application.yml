@@ -49,3 +49,6 @@ adconf:
     password: Aa123456
     binlogName: ""
     position: -1
+  # kafka信息主题.
+  kafka:
+    topic: "ad-search-mysql-data"

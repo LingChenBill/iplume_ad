@@ -1,11 +1,7 @@
 package com.iplume.ad.sender.index;
 
 import com.alibaba.fastjson.JSON;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.iplume.ad.dump.table.AdCreativeTable;
-import com.iplume.ad.dump.table.AdCreativeUnitTable;
-import com.iplume.ad.dump.table.AdPlanTable;
-import com.iplume.ad.dump.table.AdUnitTable;
+import com.iplume.ad.dump.table.*;
 import com.iplume.ad.handler.AdLevelDataHandler;
 import com.iplume.ad.index.DataLevel;
 import com.iplume.ad.mysql.constant.Constant;
@@ -18,7 +14,6 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * 增量数据投递类.
@@ -49,12 +44,11 @@ public class IndexSender implements ISender {
             handleLevel3RowData(rowData);
         } else if (DataLevel.LEVEL4.getLevel().equals(level)) {
             // 第四层级处理方法.
+            handleLevel4RowData(rowData);
         } else {
             log.error("MysqlRowData error: {}", JSON.toJSONString(rowData));
         }
     }
-
-
 
     /**
      * 第二层级数据类型处理.
@@ -92,6 +86,7 @@ public class IndexSender implements ISender {
                             adPlanTable.setEndDate(CommonUtils.parseDateString(v));
                             break;
                         default:
+                            log.debug("AdPlanTableInfo: key -> {}", k);
                             break;
                     }
                 });
@@ -136,6 +131,7 @@ public class IndexSender implements ISender {
                             creativeTable.setAdUrl(v);
                             break;
                         default:
+                            log.debug("AdCreativeTableInfo: key -> {}", k);
                             break;
                     }
                 });
@@ -184,6 +180,7 @@ public class IndexSender implements ISender {
                             unitTable.setUnitStatus(Integer.valueOf(v));
                             break;
                         default:
+                            log.debug("AdUnitTableInfo: key -> {}", k);
                             break;
                     }
                 });
@@ -212,6 +209,7 @@ public class IndexSender implements ISender {
                             creativeUnitTable.setAdId(Long.valueOf(v));
                             break;
                         default:
+                            log.debug("AdCreativeUnitTableInfo: key -> {}", k);
                             break;
                     }
                 });
@@ -224,6 +222,104 @@ public class IndexSender implements ISender {
         } else {
             // 不进行处理.
             log.debug("HandleLevel3RowData error, {}", JSON.toJSONString(rowData));
+        }
+    }
+
+    /**
+     * 第四层级处理方法.
+     *
+     * @param rowData 消息数据.
+     */
+    private void handleLevel4RowData(MysqlRowData rowData) {
+
+        switch (rowData.getTableName()) {
+            // AdUnitDistrictTable.
+            case Constant.AdUnitDistrictTableInfo.TABLE_NAME:
+                List<AdUnitDistrictTable> districtTables = new ArrayList<>();
+                for (Map<String, String> fieldValueMap : rowData.getFieldValueMap()) {
+                    // 地域限制索引存储对象.
+                    AdUnitDistrictTable districtTable = new AdUnitDistrictTable();
+
+                    fieldValueMap.forEach(
+                            (k, v) -> {
+                                switch (k) {
+                                    case Constant.AdUnitDistrictTableInfo.COLUMN_UNIT_ID:
+                                        districtTable.setUnitId(Long.valueOf(v));
+                                        break;
+                                    case Constant.AdUnitDistrictTableInfo.COLUMN_PROVINCE:
+                                        districtTable.setProvince(v);
+                                        break;
+                                    case Constant.AdUnitDistrictTableInfo.COLUMN_CITY:
+                                        districtTable.setCity(v);
+                                        break;
+                                    default:
+                                        log.debug("AdUnitDistrictTableInfo: key -> {}", k);
+                                        break;
+                                }
+                            }
+                    );
+
+                    districtTables.add(districtTable);
+                }
+
+                // 第四层级数据处理.
+                districtTables.forEach(d -> AdLevelDataHandler.handleLevel4(d, rowData.getType()));
+                break;
+            // AdUnitItTable.
+            case Constant.AdUnitItTableInfo.TABLE_NAME:
+                List<AdUnitItTable> itTables = new ArrayList<>();
+                for (Map<String, String> fieldValueMap : rowData.getFieldValueMap()) {
+
+                    // UnitIt索引存储对象.
+                    AdUnitItTable itTable = new AdUnitItTable();
+                    fieldValueMap.forEach(
+                            (k, v) -> {
+                                switch (k) {
+                                    case Constant.AdUnitItTableInfo.COLUMN_UNIT_ID:
+                                        itTable.setUnitId(Long.valueOf(v));
+                                        break;
+                                    case Constant.AdUnitItTableInfo.COLUMN_IT_TAG:
+                                        itTable.setItTag(v);
+                                        break;
+                                    default:
+                                        log.debug("AdUnitItTableInfo: key -> {}", k);
+                                        break;
+                                }
+                            });
+                    itTables.add(itTable);
+                }
+
+                // 第四层级数据处理.
+                itTables.forEach(i -> AdLevelDataHandler.handleLevel4(i, rowData.getType()));
+                break;
+            // AdUnitKeywordTable.
+            case Constant.AdUnitKeywordTableInfo.TABLE_NAME:
+                List<AdUnitKeywordTable> keywordTables = new ArrayList<>();
+                for (Map<String, String> fieldValueMap : rowData.getFieldValueMap()) {
+                    AdUnitKeywordTable keywordTable = new AdUnitKeywordTable();
+                    fieldValueMap.forEach(
+                            (k, v) -> {
+                                switch (k) {
+                                    case Constant.AdUnitKeywordTableInfo.COLUMN_UNIT_ID:
+                                        keywordTable.setUnitId(Long.valueOf(v));
+                                        break;
+                                    case Constant.AdUnitKeywordTableInfo.COLUMN_KEYWORD:
+                                        keywordTable.setKeyword(v);
+                                        break;
+                                    default:
+                                        log.debug("AdUnitKeywordTableInfo: key -> {}", k);
+                                        break;
+                                }
+                            }
+                    );
+                    keywordTables.add(keywordTable);
+                }
+                // 第四层级数据处理.
+                keywordTables.forEach(k -> AdLevelDataHandler.handleLevel4(k, rowData.getType()));
+                break;
+            default:
+                log.debug("handleLevel4RowData: tableName -> {}", rowData.getTableName());
+                break;
         }
     }
 }
