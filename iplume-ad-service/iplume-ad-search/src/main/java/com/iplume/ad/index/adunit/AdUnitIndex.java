@@ -2,9 +2,10 @@ package com.iplume.ad.index.adunit;
 
 import com.iplume.ad.index.IndexAware;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -26,6 +27,58 @@ public class AdUnitIndex implements IndexAware<Long, AdUnitObject> {
     static {
         // 线程安全的Map.
         objectMap = new ConcurrentHashMap<>();
+    }
+
+    /**
+     * 根据广告物料来匹配广告单元Id集合.
+     *
+     * @param positionType 物料类型.
+     * @return 广告单元Id集合.
+     */
+    public Set<Long> match(Integer positionType) {
+
+        Set<Long> adUnitIds = new HashSet<>();
+
+        // 广告单元Id筛选.
+        objectMap.forEach(
+                (k, v) -> {
+                    if (AdUnitObject.isAdSlotTypeOk(positionType, v.getPositionType())) {
+                        adUnitIds.add(k);
+                    }
+                }
+        );
+
+        return adUnitIds;
+    }
+
+    /**
+     * 通过广告单元Ids来获取AdUnit索引对象列表.
+     *
+     * @param adUnitIds 广告单元Ids.
+     * @return AdUnit索引对象列表.
+     */
+    public List<AdUnitObject> fetch(Collection<Long> adUnitIds) {
+
+        // 广告单元Id集合检验.
+        if (CollectionUtils.isEmpty(adUnitIds)) {
+            return Collections.emptyList();
+        }
+
+        // AdUnit索引对象列表.
+        List<AdUnitObject> unitObjects = new ArrayList<>();
+
+        // 列表装配.
+        adUnitIds.forEach(u -> {
+            AdUnitObject object = get(u);
+            if (object == null) {
+                log.error("AdUnitObject not found: {}", u);
+                return;
+            }
+
+            unitObjects.add(object);
+        });
+
+        return unitObjects;
     }
 
     /**

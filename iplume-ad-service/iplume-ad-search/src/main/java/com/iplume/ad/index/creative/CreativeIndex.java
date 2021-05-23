@@ -2,9 +2,10 @@ package com.iplume.ad.index.creative;
 
 import com.iplume.ad.index.IndexAware;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -25,6 +26,34 @@ public class CreativeIndex implements IndexAware<Long, CreativeObject> {
 
     static {
         objectMap = new ConcurrentHashMap<>();
+    }
+
+    /**
+     * 获取创意索引对象列表.
+     *
+     * @param adIds
+     * @return
+     */
+    public List<CreativeObject> fetch(Collection<Long> adIds) {
+
+        // 空校验.
+        if (CollectionUtils.isEmpty(adIds)) {
+            return Collections.emptyList();
+        }
+
+        List<CreativeObject> result = new ArrayList<>();
+
+        adIds.forEach(a -> {
+            CreativeObject creativeObject = get(a);
+            if (creativeObject == null) {
+                log.error("CreativeObject not found: {}", a);
+                return;
+            }
+
+            result.add(creativeObject);
+        });
+
+        return result;
     }
 
     /**

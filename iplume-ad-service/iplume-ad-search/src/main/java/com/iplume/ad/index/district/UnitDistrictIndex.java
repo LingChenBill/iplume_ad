@@ -1,14 +1,18 @@
 package com.iplume.ad.index.district;
 
 import com.iplume.ad.index.IndexAware;
+import com.iplume.ad.search.vo.feature.DistrictFeature;
 import com.iplume.ad.utils.CommonUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.stream.Collectors;
 
 /**
  * 区域限制索引操作类.
@@ -118,5 +122,34 @@ public class UnitDistrictIndex implements IndexAware<String, Set<Long>> {
         }
 
         log.info("UnitDistrictIndex: after delete -> {}", unitDistrictMap);
+    }
+
+    /**
+     * 校验是否匹配.
+     *
+     * @param adUnitId  广告单元Id.
+     * @param districts 所在省和城市对象.
+     * @return 匹配结果.
+     */
+    public boolean match(Long adUnitId, List<DistrictFeature.ProvinceAndCity> districts) {
+
+        if (unitDistrictMap.containsKey(adUnitId)
+                && CollectionUtils.isNotEmpty(districts)) {
+
+            // 筛选出adUnitId所对应的province-city列表.
+            Set<String> unitDistricts = unitDistrictMap.get(adUnitId);
+
+            List<String> targetDistricts = districts.stream().map(
+                    // 组合key: province-city.
+                    d -> CommonUtils.stringConcat(
+                            d.getProvince(),
+                            d.getCity()
+                    )
+            ).collect(Collectors.toList());
+
+            return CollectionUtils.isSubCollection(targetDistricts, unitDistricts);
+        }
+
+        return false;
     }
 }

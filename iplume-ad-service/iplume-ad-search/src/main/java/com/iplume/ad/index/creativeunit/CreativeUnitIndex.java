@@ -1,12 +1,12 @@
 package com.iplume.ad.index.creativeunit;
 
 import com.iplume.ad.index.IndexAware;
+import com.iplume.ad.index.adunit.AdUnitObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 
@@ -120,5 +120,32 @@ public class CreativeUnitIndex implements IndexAware<String, CreativeUnitObject>
         }
 
         log.info("CreativeUnitIndex: after delete -> {}", objectMap);
+    }
+
+    /**
+     * 获取创意Ids.
+     *
+     * @param unitObjects AdUnit索引对象列表.
+     * @return 获取创意Ids.
+     */
+    public List<Long> selectAds(List<AdUnitObject> unitObjects) {
+
+        // 空校验.
+        if (CollectionUtils.isEmpty(unitObjects)) {
+            return Collections.emptyList();
+        }
+
+        // 创意列表.
+        List<Long> result = new ArrayList<>();
+
+        for (AdUnitObject unitObject : unitObjects) {
+            // 根据广告单元Id获取对应的创意列表.
+            Set<Long> adIds = unitCreativeMap.get(unitObject.getUnitId());
+            if (CollectionUtils.isNotEmpty(adIds)) {
+                result.addAll(adIds);
+            }
+        }
+
+        return result;
     }
 }

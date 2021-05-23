@@ -230,6 +230,7 @@ public class IndexSender implements ISender {
      *
      * @param rowData 消息数据.
      */
+    @SuppressWarnings("AlibabaMethodTooLong")
     private void handleLevel4RowData(MysqlRowData rowData) {
 
         switch (rowData.getTableName()) {
