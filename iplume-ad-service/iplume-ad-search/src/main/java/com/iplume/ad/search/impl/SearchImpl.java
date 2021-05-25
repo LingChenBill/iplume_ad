@@ -1,7 +1,13 @@
 package com.iplume.ad.search.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.iplume.ad.index.CommonStatus;
 import com.iplume.ad.index.DataTable;
 import com.iplume.ad.index.adunit.AdUnitIndex;
+import com.iplume.ad.index.adunit.AdUnitObject;
+import com.iplume.ad.index.creative.CreativeIndex;
+import com.iplume.ad.index.creative.CreativeObject;
+import com.iplume.ad.index.creativeunit.CreativeUnitIndex;
 import com.iplume.ad.index.district.UnitDistrictIndex;
 import com.iplume.ad.index.interest.UnitItIndex;
 import com.iplume.ad.index.keyword.UnitKeyWordIndex;
@@ -13,7 +19,6 @@ import com.iplume.ad.search.vo.feature.FeatureRelation;
 import com.iplume.ad.search.vo.feature.ItFeature;
 import com.iplume.ad.search.vo.feature.KeywordFeature;
 import com.iplume.ad.search.vo.media.AdSlot;
-import com.iplume.ad.utils.CommonUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -57,6 +62,8 @@ public class SearchImpl implements ISearch {
         // 广告检索信息Map.
         Map<String, List<SearchResponse.Creative>> adSlot2Ads = response.getAdSlot2Ads();
 
+        // adUnitIdSet -> unitObjects -> 过滤 -> adIds -> CreativeObjects -> 过滤 -> adSlot2Ads.
+
         for (AdSlot adSlot : adSlots) {
             // 处理后广告单元Ids.
             Set<Long> targetUnitIdSet;
@@ -78,23 +85,42 @@ public class SearchImpl implements ISearch {
                         districtFeature,
                         itFeature);
             }
+
+            // 获取AdUnit索引对象列表.
+            List<AdUnitObject> unitObjects = DataTable.of(AdUnitIndex.class).fetch(targetUnitIdSet);
+            // 过滤符合条件状态的unitObjects.
+            filterAdUnitAndPlanStatus(unitObjects, CommonStatus.VALID);
+
+            // 获取广告Id列表.
+            List<Long> adIds = DataTable.of(CreativeUnitIndex.class).selectAds(unitObjects);
+
+            // 获取创意索引对象列表.
+            List<CreativeObject> creatives = DataTable.of(CreativeIndex.class).fetch(adIds);
+
+            // 通过adSlot来实现对creatives的过滤.
+            filterCreativeByAdSlot(creatives, adSlot.getWidth(), adSlot.getHeight(), adSlot.getType());
+
+            // 装载adSlot2Ads
+            adSlot2Ads.put(adSlot.getAdSlotCode(), buildCreativeResponse(creatives));
         }
 
-        return null;
+        log.info("FetchAds: {} - {}", JSON.toJSONString(request), JSON.toJSONString(response));
+
+        return response;
     }
 
     /**
      * Or关系过滤处理.
      *
-     * @param adUnitIds 广告单元Ids.
-     * @param keywordFeature 关键词信息对象.
+     * @param adUnitIds       广告单元Ids.
+     * @param keywordFeature  关键词信息对象.
      * @param districtFeature 区域信息对象.
-     * @param itFeature 兴趣信息对象.
+     * @param itFeature       兴趣信息对象.
      */
     private Set<Long> getOrRelationUnitIds(Set<Long> adUnitIds,
-                                      KeywordFeature keywordFeature,
-                                      DistrictFeature districtFeature,
-                                      ItFeature itFeature) {
+                                           KeywordFeature keywordFeature,
+                                           DistrictFeature districtFeature,
+                                           ItFeature itFeature) {
 
         if (CollectionUtils.isEmpty(adUnitIds)) {
             return Collections.emptySet();
@@ -189,5 +215,80 @@ public class SearchImpl implements ISearch {
                                     .match(adUnitId, itFeature.getIts())
             );
         }
+    }
+
+    /**
+     * 过滤符合条件状态的unitObjects.
+     *
+     * @param unitObjects AdUnit索引对象列表.
+     * @param status      状态.
+     */
+    private void filterAdUnitAndPlanStatus(List<AdUnitObject> unitObjects,
+                                           CommonStatus status) {
+
+        // 空校验.
+        if (CollectionUtils.isEmpty(unitObjects)) {
+            return;
+        }
+
+        // 通过status来过滤 unitObjects.
+        CollectionUtils.filter(
+                unitObjects,
+                unitObject -> unitObject.getUnitStatus().equals(status.getStatus())
+                        && unitObject.getAdPlanObject().getPlanStatus().equals(status.getStatus())
+        );
+    }
+
+    /**
+     * 过滤创意索引对象列表.
+     *
+     * @param creatives 创意索引对象列表.
+     * @param width     宽.
+     * @param height    高.
+     * @param types     类型,
+     */
+    private void filterCreativeByAdSlot(List<CreativeObject> creatives,
+                                        Integer width,
+                                        Integer height,
+                                        List<Integer> types) {
+
+        // 空校验.
+        if (CollectionUtils.isEmpty(creatives)) {
+            return;
+        }
+
+        // 按状态,宽,高,类型来过滤.
+        CollectionUtils.filter(
+                creatives,
+                creative -> creative.getAuditStatus().equals(CommonStatus.VALID.getStatus())
+                        && creative.getWidth().equals(width)
+                        && creative.getHeight().equals(height)
+                        && types.contains(creative.getType())
+        );
+    }
+
+    /**
+     * 构造创意对象列表.
+     *
+     * @param creatives 创意索引对象列表.
+     * @return 创意对象列表.
+     */
+    private List<SearchResponse.Creative> buildCreativeResponse(List<CreativeObject> creatives) {
+
+        // 空校验.
+        if (CollectionUtils.isEmpty(creatives)) {
+            return Collections.emptyList();
+        }
+
+        // 随机返回一个创意索引对象列表中的一个对象.
+        CreativeObject randomObject = creatives.get(
+                Math.abs(new Random().nextInt()) % creatives.size()
+        );
+
+        // 返回一个SearchResponse的创意对象.
+        return Collections.singletonList(
+                SearchResponse.convert(randomObject)
+        );
+
     }
 }

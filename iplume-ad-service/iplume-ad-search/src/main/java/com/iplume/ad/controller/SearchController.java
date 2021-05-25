@@ -5,9 +5,13 @@ import com.iplume.ad.annotation.IgnoreResponseAdvice;
 import com.iplume.ad.client.SponsorClient;
 import com.iplume.ad.client.vo.AdPlan;
 import com.iplume.ad.client.vo.AdPlanGetRequest;
+import com.iplume.ad.search.ISearch;
+import com.iplume.ad.search.vo.SearchRequest;
+import com.iplume.ad.search.vo.SearchResponse;
 import com.iplume.ad.vo.CommonResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,10 +34,28 @@ public class SearchController {
 
     private final SponsorClient sponsorClient;
 
+    private final ISearch search;
+
     @Autowired
-    public SearchController(RestTemplate restTemplate, SponsorClient sponsorClient) {
+    public SearchController(RestTemplate restTemplate,
+                            @Qualifier("eureka-client-ad-sponsor") SponsorClient sponsorClient,
+                            ISearch search) {
         this.restTemplate = restTemplate;
         this.sponsorClient = sponsorClient;
+        this.search = search;
+    }
+
+    /**
+     * 获取广告检索对象信息.
+     *
+     * @param request 广告检索服务请求对象.
+     * @return 广告检索响应对象.
+     */
+    @PostMapping("/fetchAds")
+    public SearchResponse fetchAds(@RequestBody SearchRequest request) {
+        log.info("ad-search: fetchAds -> {}", JSON.toJSONString(request));
+
+        return search.fetchAds(request);
     }
 
     /**

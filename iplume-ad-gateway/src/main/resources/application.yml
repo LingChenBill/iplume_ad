@@ -22,3 +22,9 @@ zuul:
       # 是否过滤服务前缀.
       # 访问url: http://localhost:9000/iplume/ad-sponsor/create/adPlan
       strip-prefix: false
+    # 配置ad-search广告检索服务路由.
+    # 访问: http://localhost:9000/iplume/ad-search/fetchAds
+    search:
+      path: /ad-search/**
+      serviceId: eureka-client-ad-search
+      strip-prefix: false
