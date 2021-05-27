@@ -15,6 +15,7 @@
         <module>iplume-ad-gateway</module>
         <module>iplume-ad-service</module>
         <module>iplume-springboot-study</module>
+        <module>iplume-kafka-study</module>
     </modules>
 
     <name>iplume-ad</name>
