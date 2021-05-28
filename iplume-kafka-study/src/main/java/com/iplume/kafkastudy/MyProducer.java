@@ -16,7 +16,7 @@ import java.util.Properties;
 public class MyProducer {
 
     /**
-     * kafkai消息生产.
+     * kafka消息生产.
      */
     private static KafkaProducer<String, String> producer;
 
