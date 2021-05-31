@@ -11,7 +11,7 @@ public class DtConstant {
     /**
      * 文件存储路径.
      */
-    public static final String DATA_ROOT_DIR = "src/main/resources/";
+    public static final String DATA_ROOT_DIR = "/Users/xxxxxx/Documents/fork/springcloud/iplume/iplume-ad/iplume-ad-service/iplume-ad-sponsor/src/test/resources/mysql_data/";
 
     /**
      * 各个表数据的存储文件名.

@@ -83,7 +83,7 @@ public class DumpDataService {
         // AdUnitIt.
         dumpAdUnitItTable(String.format("%s%s", DtConstant.DATA_ROOT_DIR, DtConstant.AD_UNIT_IT));
         // AdUnitIt.
-        dumpAdUnitKeywordTable(String.format("%s%s", DtConstant.DATA_ROOT_DIR, DtConstant.AD_UNIT_DISTRICT));
+        dumpAdUnitKeywordTable(String.format("%s%s", DtConstant.DATA_ROOT_DIR, DtConstant.AD_UNIT_KEYWORD));
     }
 
     /**

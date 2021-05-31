@@ -18,6 +18,7 @@
         <module>iplume-ad-common</module>
         <module>iplume-ad-sponsor</module>
         <module>iplume-ad-search</module>
+        <module>iplume-ad-dashboard</module>
     </modules>
 
     <name>iplume-ad-service</name>
