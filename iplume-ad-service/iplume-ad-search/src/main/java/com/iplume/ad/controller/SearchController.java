@@ -38,7 +38,7 @@ public class SearchController {
 
     @Autowired
     public SearchController(RestTemplate restTemplate,
-                            @Qualifier("eureka-client-ad-sponsor") SponsorClient sponsorClient,
+                            @Qualifier("sponsorClientHystrix") SponsorClient sponsorClient,
                             ISearch search) {
         this.restTemplate = restTemplate;
         this.sponsorClient = sponsorClient;

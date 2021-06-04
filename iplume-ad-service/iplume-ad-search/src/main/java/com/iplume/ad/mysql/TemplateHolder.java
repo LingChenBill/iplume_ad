@@ -44,7 +44,7 @@ public class TemplateHolder {
      * 查询Binlog的sql文.
      */
     @SuppressWarnings("AlibabaLowerCamelCaseVariableNaming")
-    private String SQL_SCHEMA = "select table_schema, table_name, column_name, ordinal_position" +
+    private String SQL_SCHEMA = "select table_schema, table_name, column_name, ordinal_position " +
             "from information_schema.columns where table_schema = ? and table_name = ?";
 
     @Autowired

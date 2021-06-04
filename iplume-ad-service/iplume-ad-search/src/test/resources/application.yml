@@ -27,6 +27,8 @@ eureka:
   client:
     service-url:
       defaultZone: http://server1:8000/eureka/
+    # 取消Eureka注册.
+    enabled: false
 
 # feign配置.
 feign:
@@ -47,8 +49,10 @@ adconf:
     port: 3306
     username: root
     password: Aa123456
-    binlogName: "binlog.000049"
-    position: 9363
+#    binlogName: "binlog.000049"
+#    position: 9363
+    binlogName: ""
+    position: -1
   # kafka信息主题.
   kafka:
     topic: "ad-search-mysql-data"

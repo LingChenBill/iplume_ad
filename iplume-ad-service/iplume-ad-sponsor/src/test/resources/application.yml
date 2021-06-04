@@ -26,3 +26,6 @@ eureka:
   client:
     service-url:
       defaultZone: http://server1:8000/eureka/
+    # 关闭eureka连接
+    # com.netflix.discovery.DiscoveryClient
+    enabled: false
