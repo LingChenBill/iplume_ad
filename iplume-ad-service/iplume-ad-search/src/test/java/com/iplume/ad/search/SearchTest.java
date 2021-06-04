@@ -49,7 +49,7 @@ public class SearchTest {
                         "iplume-ad-search",
                         Collections.singletonList(new AdSlot(
                                 "ad-x", 1,
-                                1080, 720, Arrays.asList(1, 2),
+                                720, 1080, Arrays.asList(1, 2),
                                 1000
                         )),
                         buildExampleApp(),
